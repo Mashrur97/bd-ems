@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { LayoutDashboard, PenSquare, Building2, Users, AlertTriangle, BarChart2, Search, ClipboardList, Flag, Trophy, ScrollText, Globe } from "lucide-react";
 export default function Sidebar({ items, active, onSelect, accentColor, officer, onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 

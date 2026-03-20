@@ -6,7 +6,9 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import VoteBar from "../../components/VoteBar";
 import Sidebar from "../../components/Sidebar";
+import StatCard from "../../components/StatCard";
 import toast from "react-hot-toast";
+import { CheckCircle, Globe, Trophy, ScrollText, Vote, TrendingUp, Building2, AlertTriangle } from "lucide-react";
 
 export default function RODashboard() {
   const navigate = useNavigate();
@@ -32,10 +34,10 @@ export default function RODashboard() {
   };
 
   const sidebarItems = [
-    { id: "approval", icon: "✅", label: "Final Approval" },
-    { id: "national", icon: "🌐", label: "National View" },
-    { id: "winners", icon: "🏆", label: "Winners" },
-    { id: "audit", icon: "🔎", label: "Audit Log" },
+    { id: "approval", icon: <CheckCircle size={16} />, label: "Final Approval" },
+    { id: "national", icon: <Globe size={16} />, label: "National View" },
+    { id: "winners", icon: <Trophy size={16} />, label: "Winners" },
+    { id: "audit", icon: <ScrollText size={16} />, label: "Audit Log" },
   ];
 
   return (
@@ -56,7 +58,9 @@ export default function RODashboard() {
           {/* FINAL APPROVAL */}
           {section === "approval" && (
             <div>
-              <div className="text-2xl font-bold mb-1">✅ Final Constituency Approval</div>
+              <div className="flex items-center gap-2 text-2xl font-bold mb-1">
+                <CheckCircle size={24} className="text-red-400" /> Final Constituency Approval
+              </div>
               <div className="text-xs text-white/30 mb-6">Review compiled results and officially declare</div>
 
               <div className="bg-white/[0.03] border border-yellow-500/20 rounded-2xl p-6 mb-5">
@@ -98,20 +102,14 @@ export default function RODashboard() {
           {/* NATIONAL VIEW */}
           {section === "national" && (
             <div>
-              <div className="text-2xl font-bold mb-6">🌐 National Overview</div>
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                {[
-                  { icon: "🗳️", val: totalVotes().toLocaleString(), label: "TOTAL VOTES", color: "text-yellow-400", border: "border-yellow-500/20" },
-                  { icon: "📈", val: turnout() + "%", label: "TURNOUT", color: "text-green-400", border: "border-green-500/20" },
-                  { icon: "🏫", val: "847", label: "STATIONS", color: "text-blue-400", border: "border-blue-500/20" },
-                  { icon: "🚨", val: "2", label: "FLAGS", color: "text-red-400", border: "border-red-500/20" },
-                ].map((s) => (
-                  <div key={s.label} className={`bg-white/[0.03] border ${s.border} rounded-2xl p-5 text-center`}>
-                    <div className="text-2xl mb-1">{s.icon}</div>
-                    <div className={`font-mono text-2xl font-bold ${s.color}`}>{s.val}</div>
-                    <div className="text-[10px] text-white/30 tracking-widest mt-1">{s.label}</div>
-                  </div>
-                ))}
+              <div className="flex items-center gap-2 text-2xl font-bold mb-6">
+                <Globe size={24} className="text-red-400" /> National Overview
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <StatCard icon={<Vote size={22} className="text-yellow-400" />} value={totalVotes()} label="TOTAL VOTES" color="text-yellow-400" border="border-yellow-500/20" />
+                <StatCard icon={<TrendingUp size={22} className="text-green-400" />} value={parseFloat(turnout())} label="TURNOUT" color="text-green-400" border="border-green-500/20" isPercent />
+                <StatCard icon={<Building2 size={22} className="text-blue-400" />} value={847} label="STATIONS" color="text-blue-400" border="border-blue-500/20" />
+                <StatCard icon={<AlertTriangle size={22} className="text-red-400" />} value={2} label="FLAGS" color="text-red-400" border="border-red-500/20" />
               </div>
               <div className="bg-white/[0.03] border border-yellow-500/20 rounded-2xl p-6">
                 <div className="text-[10px] tracking-widest text-yellow-400 mb-4">NATIONAL TALLY</div>
@@ -123,7 +121,9 @@ export default function RODashboard() {
           {/* WINNERS */}
           {section === "winners" && (
             <div>
-              <div className="text-2xl font-bold mb-6">🏆 Constituency Winners</div>
+              <div className="flex items-center gap-2 text-2xl font-bold mb-6">
+                <Trophy size={24} className="text-red-400" /> Constituency Winners
+              </div>
               <div className="flex flex-col gap-4">
                 {sorted.map((c, i) => (
                   <div key={c.id} className="flex items-center gap-5 rounded-2xl p-5 border"
@@ -149,7 +149,9 @@ export default function RODashboard() {
           {/* AUDIT LOG */}
           {section === "audit" && (
             <div>
-              <div className="text-2xl font-bold mb-6">🔎 System Audit Log</div>
+              <div className="flex items-center gap-2 text-2xl font-bold mb-6">
+                <ScrollText size={24} className="text-red-400" /> System Audit Log
+              </div>
               <div className="flex flex-col gap-2">
                 {auditLog.map((e, i) => (
                   <div key={i} className="flex gap-4 items-center px-4 py-3 bg-white/[0.02] rounded-xl text-sm border border-white/[0.04]">
@@ -167,7 +169,9 @@ export default function RODashboard() {
       {showModal && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-[#0d1117] border border-red-500/25 rounded-2xl p-9 max-w-sm w-[90%] text-center">
-            <div className="text-4xl mb-3">⚖️</div>
+            <div className="flex justify-center mb-3">
+              <CheckCircle size={44} className="text-red-400" />
+            </div>
             <div className="text-xl font-bold mb-2">Officially Declare Results?</div>
             <div className="text-xs text-white/30 mb-6">This will publish results to the public feed and cannot be reversed without an official review process.</div>
             <div className="flex gap-3">

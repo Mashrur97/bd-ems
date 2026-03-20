@@ -7,6 +7,7 @@ import Footer from "../../components/Footer";
 import VoteBar from "../../components/VoteBar";
 import Sidebar from "../../components/Sidebar";
 import toast from "react-hot-toast";
+import { PenSquare, Building2, CheckCircle } from "lucide-react";
 
 export default function APODashboard() {
   const navigate = useNavigate();
@@ -77,9 +78,9 @@ export default function APODashboard() {
   };
 
   const sidebarItems = [
-    { id: "entry", icon: "📝", label: "Vote Entry" },
-    { id: "booths", icon: "🏫", label: "My Booths" },
-    { id: "submitted", icon: "✅", label: "Submitted" },
+    { id: "entry", icon: <PenSquare size={16} />, label: "Vote Entry" },
+    { id: "booths", icon: <Building2 size={16} />, label: "My Booths" },
+    { id: "submitted", icon: <CheckCircle size={16} />, label: "Submitted" },
   ];
 
   const station = STATIONS.find((s) => s.id === officer.station);
@@ -109,7 +110,7 @@ export default function APODashboard() {
           {/* VOTE ENTRY */}
           {section === "entry" && (
             <div>
-              <div className="text-2xl font-bold mb-1">📝 Booth Vote Entry</div>
+              <div className="flex items-center gap-2 text-2xl font-bold mb-1"><PenSquare size={24} className="text-yellow-400" /> Booth Vote Entry</div>
               <div className="text-xs text-white/30 mb-6">
                 Enter vote counts from physical ballot papers
               </div>
@@ -281,9 +282,7 @@ export default function APODashboard() {
           {/* MY BOOTHS */}
           {section === "booths" && (
             <div>
-              <div className="text-2xl font-bold mb-6">
-                🏫 My Assigned Booths
-              </div>
+              <div className="flex items-center gap-2 text-2xl font-bold mb-6"><Building2 size={24} className="text-yellow-400" /> My Assigned Booths</div>
               <div className="flex flex-col gap-4">
                 {myBooths.map((b) => (
                   <div
@@ -316,9 +315,7 @@ export default function APODashboard() {
           {/* SUBMITTED */}
           {section === "submitted" && (
             <div>
-              <div className="text-2xl font-bold mb-6">
-                ✅ Submitted Results
-              </div>
+             <div className="flex items-center gap-2 text-2xl font-bold mb-6"><CheckCircle size={24} className="text-yellow-400" /> Submitted Results</div>
               {submittedBooths.length === 0 ? (
                 <div className="text-center py-16 text-white/30">
                   No booths submitted yet.
