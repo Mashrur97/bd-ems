@@ -105,7 +105,7 @@ export default function APODashboard() {
           }}
         />
 
-        <div className="flex-1 p-8 overflow-auto">
+        <div className="flex-1 p-4 md:p-8 overflow-auto pb-24 md:pb-8">
           {/* VOTE ENTRY */}
           {section === "entry" && (
             <div>

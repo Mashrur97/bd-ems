@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useElection } from "../store/ElectionContext";
 
 export default function Navbar({ title, subtitle, rightContent, backTo }) {
   const navigate = useNavigate();
@@ -12,22 +11,21 @@ export default function Navbar({ title, subtitle, rightContent, backTo }) {
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 bg-black/60 border-b border-white/10 backdrop-blur px-6 md:px-10 py-3 flex justify-between items-center">
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">🇧🇩</span>
-        <div>
-          <div className="text-xs font-bold text-yellow-400 tracking-widest">
+    <div className="sticky top-0 z-50 bg-black/60 border-b border-white/10 backdrop-blur px-4 md:px-10 py-3 flex justify-between items-center gap-2">
+      <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        <span className="text-xl md:text-2xl flex-shrink-0">🇧🇩</span>
+        <div className="min-w-0">
+          <div className="text-[10px] md:text-xs font-bold text-yellow-400 tracking-widest truncate">
             {title || "BANGLADESH ELECTION COMMISSION"}
           </div>
-          <div className="text-[10px] text-white/30">
+          <div className="text-[9px] md:text-[10px] text-white/30 truncate">
             {subtitle || "বাংলাদেশ নির্বাচন কমিশন · EMS v2.0"}
           </div>
         </div>
       </div>
-
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {rightContent}
-        <span className="font-mono text-xs text-white/30 hidden md:block">
+        <span className="font-mono text-xs text-white/30 hidden lg:block">
           {time.toLocaleTimeString("en-BD")}
         </span>
         {backTo && (
