@@ -1,0 +1,22 @@
+{
+  "name": "Bangladesh Election Management System",
+  "short_name": "BD Election",
+  "description": "Digital Election Management System - Bangladesh Election Commission",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06090f",
+  "theme_color": "#e8b84b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://flagcdn.com/w320/bd.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://flagcdn.com/w640/bd.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
