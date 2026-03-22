@@ -18,6 +18,262 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
+// ─── HOW IT WORKS ────────────────────────────────────────────────────────────
+function HowItWorks() {
+  const [active, setActive] = useState("voter");
+
+  const tabs = [
+    {
+      id: "voter",
+      label: "ভোটার",
+      shortLabel: "ভোটার",
+      icon: <UserCheck size={14} />,
+      color: "text-green-400",
+      border: "border-green-500/40",
+      bg: "bg-green-500/15",
+    },
+    {
+      id: "apo",
+      label: "সহকারী প্রিসাইডিং অফিসার",
+      shortLabel: "স.প্র.অ.",
+      icon: <PenLine size={14} />,
+      color: "text-yellow-400",
+      border: "border-yellow-500/40",
+      bg: "bg-yellow-500/15",
+    },
+    {
+      id: "po",
+      label: "প্রিসাইডিং অফিসার",
+      shortLabel: "প্র.অ.",
+      icon: <ShieldCheck size={14} />,
+      color: "text-orange-400",
+      border: "border-orange-500/40",
+      bg: "bg-orange-500/15",
+    },
+    {
+      id: "aro",
+      label: "সহকারী রিটার্নিং অফিসার",
+      shortLabel: "স.রি.অ.",
+      icon: <ClipboardList size={14} />,
+      color: "text-purple-400",
+      border: "border-purple-500/40",
+      bg: "bg-purple-500/15",
+    },
+    {
+      id: "ro",
+      label: "রিটার্নিং অফিসার",
+      shortLabel: "রি.অ.",
+      icon: <Scale size={14} />,
+      color: "text-red-400",
+      border: "border-red-500/40",
+      bg: "bg-red-500/15",
+    },
+    {
+      id: "guest",
+      label: "অতিথি",
+      shortLabel: "অতিথি",
+      icon: <Radio size={14} />,
+      color: "text-blue-400",
+      border: "border-blue-500/40",
+      bg: "bg-blue-500/15",
+    },
+  ];
+
+  const steps = {
+    voter: [
+      {
+        n: "০১",
+        title: "লগইন করুন",
+        desc: "আপনার জাতীয় পরিচয়পত্র (NID) নম্বর এবং জন্ম তারিখ দিয়ে ভোটার পোর্টালে প্রবেশ করুন।",
+      },
+      {
+        n: "০২",
+        title: "প্রার্থী বাছাই করুন",
+        desc: "আপনার পছন্দের প্রার্থী নির্বাচন করুন। প্রতিটি প্রার্থীর নাম, দল ও প্রতীক দেখা যাবে।",
+      },
+      {
+        n: "০৩",
+        title: "ভোট নিশ্চিত করুন",
+        desc: "আপনার বাছাই করা প্রার্থীকে নিশ্চিত করুন। একবার ভোট দিলে পরিবর্তন করা যাবে না।",
+      },
+      {
+        n: "০৪",
+        title: "রসিদ সংগ্রহ করুন",
+        desc: "ভোট প্রদানের পর আপনার অফিশিয়াল ভোটিং রসিদ ডাউনলোড করুন।",
+      },
+    ],
+    apo: [
+      {
+        n: "০১",
+        title: "লগইন করুন",
+        desc: "আপনার অফিসার আইডি ও পিন দিয়ে সহকারী প্রিসাইডিং অফিসার পোর্টালে প্রবেশ করুন।",
+      },
+      {
+        n: "০২",
+        title: "বুথ নির্বাচন করুন",
+        desc: "আপনার নির্ধারিত বুথগুলো থেকে একটি বুথ বাছাই করুন এবং ভোট গণনা শুরু করুন।",
+      },
+      {
+        n: "০৩",
+        title: "ভোট সংখ্যা প্রবেশ করুন",
+        desc: "প্রতিটি প্রার্থীর ভোট সংখ্যা, বিতরণকৃত ব্যালট এবং ব্যবহৃত ব্যালটের সংখ্যা লিখুন।",
+      },
+      {
+        n: "০৪",
+        title: "যাচাই ও জমা দিন",
+        desc: "সিস্টেম স্বয়ংক্রিয়ভাবে ভোট সংখ্যা যাচাই করবে। সঠিক হলে জমা দিন।",
+      },
+    ],
+    po: [
+      {
+        n: "০১",
+        title: "লগইন করুন",
+        desc: "আপনার অফিসার আইডি ও পিন দিয়ে প্রিসাইডিং অফিসার পোর্টালে প্রবেশ করুন।",
+      },
+      {
+        n: "০২",
+        title: "বুথ ফলাফল পর্যালোচনা করুন",
+        desc: "সকল বুথের সহকারী প্রিসাইডিং অফিসারের জমা দেওয়া ফলাফল পর্যালোচনা করুন।",
+      },
+      {
+        n: "০৩",
+        title: "ঘটনা রিপোর্ট করুন",
+        desc: "কোনো অনিয়ম বা ঘটনা ঘটলে তাৎক্ষণিকভাবে রিপোর্ট করুন।",
+      },
+      {
+        n: "০৪",
+        title: "ফলাফল যাচাই ও জমা দিন",
+        desc: "সকল বুথের ফলাফল সঠিক হলে স্টেশনের ফলাফল যাচাই করে সহকারী রিটার্নিং অফিসারের কাছে পাঠান।",
+      },
+    ],
+    aro: [
+      {
+        n: "০১",
+        title: "লগইন করুন",
+        desc: "আপনার অফিসার আইডি ও পিন দিয়ে সহকারী রিটার্নিং অফিসার পোর্টালে প্রবেশ করুন।",
+      },
+      {
+        n: "০২",
+        title: "স্টেশন যাচাই পর্যালোচনা করুন",
+        desc: "সকল পোলিং স্টেশনের প্রিসাইডিং অফিসারের যাচাইকৃত ফলাফল দেখুন।",
+      },
+      {
+        n: "০৩",
+        title: "জালিয়াতি পতাকা পর্যালোচনা করুন",
+        desc: "সিস্টেম কর্তৃক চিহ্নিত যেকোনো অস্বাভাবিকতা বা জালিয়াতির সতর্কতা পর্যালোচনা করুন।",
+      },
+      {
+        n: "০৪",
+        title: "সংকলন ও পাঠান",
+        desc: "নির্বাচনী এলাকার সকল ফলাফল সংকলন করে রিটার্নিং অফিসারের কাছে চূড়ান্ত অনুমোদনের জন্য পাঠান।",
+      },
+    ],
+    ro: [
+      {
+        n: "০১",
+        title: "লগইন করুন",
+        desc: "আপনার অফিসার আইডি ও পিন দিয়ে রিটার্নিং অফিসার পোর্টালে প্রবেশ করুন।",
+      },
+      {
+        n: "০২",
+        title: "সংকলিত ফলাফল পর্যালোচনা করুন",
+        desc: "সহকারী রিটার্নিং অফিসারের পাঠানো সংকলিত নির্বাচনী এলাকার ফলাফল পর্যালোচনা করুন।",
+      },
+      {
+        n: "০৩",
+        title: "জাতীয় ফলাফল দেখুন",
+        desc: "সারা দেশের সকল নির্বাচনী এলাকার ফলাফল ও পরিসংখ্যান দেখুন।",
+      },
+      {
+        n: "০৪",
+        title: "ফলাফল আনুষ্ঠানিকভাবে ঘোষণা করুন",
+        desc: "সকল ফলাফল সঠিক হলে আনুষ্ঠানিকভাবে নির্বাচনের ফলাফল ঘোষণা করুন এবং জনগণের জন্য প্রকাশ করুন।",
+      },
+    ],
+    guest: [
+      {
+        n: "০১",
+        title: "সরাসরি ফলাফল দেখুন",
+        desc: "কোনো লগইন ছাড়াই সরাসরি ফলাফল পোর্টালে প্রবেশ করুন এবং রিয়েল-টাইম ভোট গণনা দেখুন।",
+      },
+      {
+        n: "০২",
+        title: "প্রার্থীদের ফলাফল দেখুন",
+        desc: "প্রতিটি প্রার্থীর মোট ভোট সংখ্যা ও শতকরা হার দেখুন।",
+      },
+      {
+        n: "০৩",
+        title: "নির্বাচনী এলাকার তথ্য দেখুন",
+        desc: "বিভিন্ন নির্বাচনী এলাকার ফলাফল ও রিপোর্টিং স্ট্যাটাস দেখুন।",
+      },
+      {
+        n: "০৪",
+        title: "জালিয়াতি সতর্কতা দেখুন",
+        desc: "সিস্টেম কর্তৃক চিহ্নিত যেকোনো অস্বাভাবিকতা বা জালিয়াতির সতর্কতা দেখুন।",
+      },
+    ],
+  };
+
+  const activeTab = tabs.find((t) => t.id === active);
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 pb-20">
+      <div className="text-center mb-8 md:mb-10">
+        <div className="text-[10px] tracking-widest text-white/30 mb-2">
+          ব্যবহার নির্দেশিকা
+        </div>
+        <div className="text-xl md:text-3xl font-bold">
+          কীভাবে ব্যবহার করবেন?
+        </div>
+      </div>
+
+      {/* tabs — icons only on mobile, full label on desktop */}
+      <div className="flex flex-wrap gap-2 justify-center mb-8">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActive(t.id)}
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+              active === t.id
+                ? `${t.bg} ${t.border} ${t.color}`
+                : "bg-white/[0.03] border-white/10 text-white/40 hover:text-white/70"
+            }`}
+          >
+            {t.icon}
+            <span className="inline md:hidden">{t.shortLabel}</span>
+            <span className="hidden md:inline">{t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* steps */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        {steps[active].map((step, i) => (
+          <div
+            key={i}
+            className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-4 md:p-5 flex gap-3 md:gap-4"
+          >
+            <div
+              className={`text-xl md:text-2xl font-black font-mono flex-shrink-0 ${activeTab.color} opacity-40`}
+            >
+              {step.n}
+            </div>
+            <div>
+              <div className={`font-bold text-sm mb-1.5 ${activeTab.color}`}>
+                {step.title}
+              </div>
+              <div className="text-xs text-white/50 leading-relaxed">
+                {step.desc}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── LANDING ─────────────────────────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
   const { totalVotes, turnout } = useElection();
@@ -94,7 +350,7 @@ export default function Landing() {
     <div className="min-h-screen bg-[#06090f] text-white">
       <Navbar />
 
-      {/* particles as full page background */}
+      {/* particles bg */}
       <div
         style={{
           position: "fixed",
@@ -209,6 +465,9 @@ export default function Landing() {
             </div>
           </div>
         </div>
+
+        {/* how it works */}
+        <HowItWorks />
 
         <Footer />
       </div>
