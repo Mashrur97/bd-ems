@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Particles from "../reactbits/Particles";
 import BlurText from "../reactbits/BlurText";
+import DecryptedText from "../reactbits/DecryptedText";
 import {
   Radio,
   UserCheck,
@@ -219,7 +220,7 @@ function HowItWorks() {
   return (
     <div className="max-w-5xl mx-auto px-4 pb-20">
       <div className="text-center mb-8 md:mb-10">
-        <div className="text-[10px] tracking-widest text-white/30 mb-2">
+        <div className="text-sm tracking-widest text-white/30 mb-2">
           ব্যবহার নির্দেশিকা
         </div>
         <div className="text-xl md:text-3xl font-bold">
@@ -250,7 +251,7 @@ function HowItWorks() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {steps[active].map((step, i) => (
           <div
-            key={i}
+            key={`${active}-${i}`}
             className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-4 md:p-5 flex gap-3 md:gap-4"
           >
             <div
@@ -260,10 +261,28 @@ function HowItWorks() {
             </div>
             <div>
               <div className={`font-bold text-sm mb-1.5 ${activeTab.color}`}>
-                {step.title}
+                <DecryptedText
+                  key={`title-${active}-${i}`}
+                  text={step.title}
+                  animateOn="view"
+                  revealDirection="start"
+                  sequential
+                  speed={15}
+                  characters="০১২৩৪৫৬৭৮৯!?#"
+                  useOriginalCharsOnly={false}
+                />
               </div>
               <div className="text-xs text-white/50 leading-relaxed">
-                {step.desc}
+                <DecryptedText
+                  key={`desc-${active}-${i}`}
+                  text={step.desc}
+                  animateOn="view"
+                  revealDirection="start"
+                  sequential
+                  speed={5}
+                  characters="০১২৩৪৫৬৭৮৯!?#"
+                  useOriginalCharsOnly={false}
+                />
               </div>
             </div>
           </div>
