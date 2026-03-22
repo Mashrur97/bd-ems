@@ -64,7 +64,7 @@ export default function Navbar({ title, subtitle, rightContent, backTo }) {
             {title || "BANGLADESH ELECTION COMMISSION"}
           </div>
           <div className="text-[9px] md:text-[10px] text-white/50 truncate">
-            {subtitle || "বাংলাদেশ নির্বাচন কমিশন · EMS v2.0"}
+            {subtitle || "বাংলাদেশ নির্বাচন কমিশন · EMS"}
           </div>
         </div>
       </div>

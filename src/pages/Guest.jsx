@@ -16,6 +16,7 @@ export default function Guest() {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -46,6 +47,7 @@ export default function Guest() {
           zIndex: 0,
           pointerEvents: "none",
           opacity: 0.6,
+          willChange: "transform" 
         }}
       >
         <Hyperspeed />
