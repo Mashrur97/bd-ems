@@ -67,7 +67,7 @@ export default function OfficerLogin({
       >
         <LightRays
           raysOrigin="top-center"
-          raysColor="#22c55e"
+          raysColor={accentColor}
           raysSpeed={1}
           lightSpread={0.8}
           rayLength={2}

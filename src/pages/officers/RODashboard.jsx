@@ -50,7 +50,6 @@ export default function RODashboard() {
           onSelect={setSection}
           accentColor="#e74c3c"
           officer={officer}
-          onLogout={() => { sessionStorage.clear(); toast.success("Logged out successfully"); navigate("/"); }}
         />
 
         <div className="flex-1 p-4 md:p-8 overflow-auto pb-24 md:pb-8">

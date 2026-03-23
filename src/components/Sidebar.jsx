@@ -1,8 +1,4 @@
-import { useState } from "react";
-import { LayoutDashboard, PenSquare, Building2, Users, AlertTriangle, BarChart2, Search, ClipboardList, Flag, Trophy, ScrollText, Globe } from "lucide-react";
-export default function Sidebar({ items, active, onSelect, accentColor, officer, onLogout }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
+export default function Sidebar({ items, active, onSelect, accentColor, officer }) {
   return (
     <>
       {/* mobile bottom nav */}
@@ -19,13 +15,6 @@ export default function Sidebar({ items, active, onSelect, accentColor, officer,
               <span className="truncate w-full text-center px-1">{item.label}</span>
             </button>
           ))}
-          <button
-            onClick={onLogout}
-            className="flex-1 flex flex-col items-center py-3 gap-1 text-[10px] text-red-400"
-          >
-            <span className="text-lg">🚪</span>
-            <span>Logout</span>
-          </button>
         </div>
       </div>
 
@@ -53,12 +42,6 @@ export default function Sidebar({ items, active, onSelect, accentColor, officer,
               <span>{item.label}</span>
             </button>
           ))}
-        </div>
-        <div className="p-3">
-          <button
-            onClick={onLogout}
-            className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs hover:bg-red-500/20 transition-all"
-          >← Logout</button>
         </div>
       </div>
     </>

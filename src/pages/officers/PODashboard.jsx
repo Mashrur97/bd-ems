@@ -71,11 +71,6 @@ export default function PODashboard() {
           onSelect={setSection}
           accentColor="#e67e22"
           officer={officer}
-          onLogout={() => {
-            sessionStorage.clear();
-            toast.success("Logged out successfully");
-            navigate("/");
-          }}
         />
 
         <div className="flex-1 p-4 md:p-8 overflow-auto pb-24 md:pb-8">

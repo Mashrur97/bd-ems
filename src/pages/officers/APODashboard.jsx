@@ -99,11 +99,6 @@ export default function APODashboard() {
           onSelect={setSection}
           accentColor="#e8b84b"
           officer={officer}
-          onLogout={() => {
-            sessionStorage.clear();
-            toast.success("Logged out successfully");
-            navigate("/");
-          }}
         />
 
         <div className="flex-1 p-4 md:p-8 overflow-auto pb-24 md:pb-8">
