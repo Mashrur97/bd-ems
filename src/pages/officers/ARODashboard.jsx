@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useElection } from "../../store/ElectionContext";
-import { CANDIDATES, STATIONS, BOOTHS, CONSTITUENCIES } from "../../data/mockData";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import VoteBar from "../../components/VoteBar";
@@ -9,23 +8,56 @@ import Sidebar from "../../components/Sidebar";
 import StatCard from "../../components/StatCard";
 import toast from "react-hot-toast";
 import { BarChart2, Building2, Flag, AlertTriangle, Vote } from "lucide-react";
+import api from "../../api";
 
 export default function ARODashboard() {
   const navigate = useNavigate();
-  const { booths, stations, fraudFlags, totalVotes, compileConstituency, constituencyCompiled } = useElection();
+  const {
+    booths,
+    stations,
+    candidates,
+    fraudFlags,
+    totalVotes,
+    fetchPublicResults,
+    compileConstituency,
+    constituencyCompiled,
+  } = useElection();
   const [section, setSection] = useState("compile");
+  const [compiling, setCompiling] = useState(false);
+  const [constituencyStations, setConstituencyStations] = useState([]);
   const [officer] = useState(() => JSON.parse(sessionStorage.getItem("currentOfficer")));
 
-  if (!officer) { navigate("/officer/aro"); return null; }
+  useEffect(() => {
+    if (!officer) { navigate("/officer/aro"); return; }
+    fetchPublicResults();
+    loadStations();
+  }, []);
 
-  const myConstituency = CONSTITUENCIES.find((c) => c.id === officer.constituency);
-  const myStations = stations.filter((s) => myConstituency?.stations.includes(s.id));
+  const loadStations = async () => {
+    try {
+      const { data } = await api.get(`/api/station/constituency/${officer.constituencyId}`);
+      setConstituencyStations(data.stations || []);
+    } catch {
+      setConstituencyStations([]);
+    }
+  };
+
+  if (!officer) return null;
+
+  const myStations = constituencyStations.length > 0 ? constituencyStations : stations;
   const verifiedStations = myStations.filter((s) => s.verified);
 
-  const handleCompile = () => {
+  const handleCompile = async () => {
     if (constituencyCompiled) { toast.error("Already compiled"); return; }
-    compileConstituency(officer.name);
-    toast.success("Compiled and forwarded to Returning Officer");
+    setCompiling(true);
+    try {
+      await compileConstituency();
+      toast.success("Compiled and forwarded to Returning Officer");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to compile");
+    } finally {
+      setCompiling(false);
+    }
   };
 
   const sidebarItems = [
@@ -36,7 +68,11 @@ export default function ARODashboard() {
 
   return (
     <div className="min-h-screen bg-[#06090f] text-white flex flex-col">
-      <Navbar title="ASST. RETURNING OFFICER" subtitle={myConstituency?.name} backTo="/" />
+      <Navbar
+        title="ASST. RETURNING OFFICER"
+        subtitle={`Constituency ID: ${officer.constituencyId}`}
+        backTo="/"
+      />
       <div className="flex flex-1">
         <Sidebar
           items={sidebarItems}
@@ -57,9 +93,28 @@ export default function ARODashboard() {
               <div className="text-xs text-white/30 mb-6">Aggregate verified station results</div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <StatCard icon={<Building2 size={22} className="text-purple-400" />} value={`${verifiedStations.length}/${myStations.length}`} label="STATIONS VERIFIED" color="text-purple-400" border="border-purple-500/20" isString />
-                <StatCard icon={<Vote size={22} className="text-yellow-400" />} value={totalVotes()} label="TOTAL VOTES" color="text-yellow-400" border="border-yellow-500/20" />
-                <StatCard icon={<AlertTriangle size={22} className="text-red-400" />} value={fraudFlags.length} label="ACTIVE FLAGS" color="text-red-400" border="border-red-500/20" />
+                <StatCard
+                  icon={<Building2 size={22} className="text-purple-400" />}
+                  value={`${verifiedStations.length}/${myStations.length}`}
+                  label="STATIONS VERIFIED"
+                  color="text-purple-400"
+                  border="border-purple-500/20"
+                  isString
+                />
+                <StatCard
+                  icon={<Vote size={22} className="text-yellow-400" />}
+                  value={totalVotes()}
+                  label="TOTAL VOTES"
+                  color="text-yellow-400"
+                  border="border-yellow-500/20"
+                />
+                <StatCard
+                  icon={<AlertTriangle size={22} className="text-red-400" />}
+                  value={fraudFlags.length}
+                  label="ACTIVE FLAGS"
+                  color="text-red-400"
+                  border="border-red-500/20"
+                />
               </div>
 
               <div className="bg-white/[0.03] border border-purple-500/20 rounded-2xl p-6 mb-5">
@@ -69,15 +124,18 @@ export default function ARODashboard() {
 
               {!constituencyCompiled ? (
                 <div>
-                  {verifiedStations.length < myStations.length && (
+                  {verifiedStations.length < myStations.length && myStations.length > 0 && (
                     <div className="bg-orange-500/10 border border-orange-500/25 rounded-xl px-4 py-3 text-orange-400 text-xs mb-4">
                       ⚠ {myStations.length - verifiedStations.length} station(s) pending verification. Compilation will be partial.
                     </div>
                   )}
                   <button
                     onClick={handleCompile}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-sm hover:brightness-110 transition-all"
-                  >Compile & Forward to Returning Officer →</button>
+                    disabled={compiling}
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50"
+                  >
+                    {compiling ? "Compiling..." : "Compile & Forward to Returning Officer →"}
+                  </button>
                 </div>
               ) : (
                 <div className="bg-green-500/10 border border-green-500/25 rounded-xl px-4 py-3 text-green-400 text-sm">
@@ -93,37 +151,58 @@ export default function ARODashboard() {
               <div className="flex items-center gap-2 text-2xl font-bold mb-6">
                 <Building2 size={24} className="text-purple-400" /> Polling Stations
               </div>
-              <div className="flex flex-col gap-4">
-                {myStations.map((s) => {
-                  const sBooths = booths.filter((b) => b.station === s.id && b.submitted);
-                  return (
-                    <div key={s.id} className={`bg-white/[0.03] border rounded-2xl p-5 ${s.verified ? "border-green-500/20" : "border-white/10"}`}>
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <div className="font-bold text-base">{s.name}</div>
-                          <div className="text-xs text-white/30 mt-0.5">
-                            {sBooths.length}/{booths.filter((b) => b.station === s.id).length} booths submitted
-                          </div>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                          s.verified ? "bg-green-500/15 border-green-500/30 text-green-400" : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                        }`}>{s.verified ? "VERIFIED" : "PENDING"}</span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        {CANDIDATES.map((c) => {
-                          const total = sBooths.reduce((a, b) => a + (b.candidateVotes[c.id] || 0), 0);
-                          return (
-                            <div key={c.id} className="bg-white/[0.04] rounded-xl p-2.5 text-center">
-                              <div className="text-base">{c.symbol}</div>
-                              <div className="font-bold text-yellow-400 font-mono text-sm">{total}</div>
+              {myStations.length === 0 ? (
+                <div className="text-center py-16 text-white/30">No stations found.</div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {myStations.map((s) => {
+                    const sId = s.stationId ?? s.id;
+                    const sBooths = booths.filter((b) => (b.stationId ?? b.station) === sId && b.submitted);
+                    const allBooths = booths.filter((b) => (b.stationId ?? b.station) === sId);
+                    return (
+                      <div
+                        key={sId}
+                        className={`bg-white/[0.03] border rounded-2xl p-5 ${s.verified ? "border-green-500/20" : "border-white/10"}`}
+                      >
+                        <div className="flex justify-between items-center mb-4">
+                          <div>
+                            <div className="font-bold text-base">{s.name}</div>
+                            <div className="text-xs text-white/30 mt-0.5">
+                              {sBooths.length}/{allBooths.length} booths submitted
                             </div>
-                          );
-                        })}
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                            s.verified
+                              ? "bg-green-500/15 border-green-500/30 text-green-400"
+                              : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                          }`}>
+                            {s.verified ? "VERIFIED" : "PENDING"}
+                          </span>
+                        </div>
+                        {candidates.length > 0 && (
+                          <div className="grid grid-cols-4 gap-2">
+                            {candidates.map((c) => {
+                              const total = sBooths.reduce((a, b) => {
+                                const cv = b.candidateVotes;
+                                const val = cv instanceof Map
+                                  ? cv.get(String(c.candidateId))
+                                  : cv?.[c.candidateId] ?? cv?.[String(c.candidateId)] ?? 0;
+                                return a + Number(val);
+                              }, 0);
+                              return (
+                                <div key={c.candidateId} className="bg-white/[0.04] rounded-xl p-2.5 text-center">
+                                  <div className="text-base">{c.symbol}</div>
+                                  <div className="font-bold text-yellow-400 font-mono text-sm">{total}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -137,17 +216,31 @@ export default function ARODashboard() {
                 <div className="text-center py-16 text-white/30">No active flags.</div>
               ) : (
                 fraudFlags.map((f, i) => (
-                  <div key={i} className={`bg-white/[0.03] border rounded-2xl p-5 mb-3 ${f.severity === "high" ? "border-red-500/25" : "border-orange-500/20"}`}>
+                  <div
+                    key={f._id || i}
+                    className={`bg-white/[0.03] border rounded-2xl p-5 mb-3 ${
+                      f.severity === "high" ? "border-red-500/25" : "border-orange-500/20"
+                    }`}
+                  >
                     <div className="flex justify-between items-center">
                       <div>
                         <div className={`font-bold text-sm mb-1 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}>
                           ⚠ {f.booth} — {f.station}
                         </div>
                         <div className="text-xs text-white/40">{f.issue}</div>
+                        {f.createdAt && (
+                          <div className="text-xs text-white/20 mt-1">
+                            {new Date(f.createdAt).toLocaleString("en-BD")}
+                          </div>
+                        )}
                       </div>
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                        f.severity === "high" ? "bg-red-500/15 border-red-500/25 text-red-400" : "bg-orange-500/15 border-orange-500/25 text-orange-400"
-                      }`}>{f.severity.toUpperCase()}</span>
+                        f.severity === "high"
+                          ? "bg-red-500/15 border-red-500/25 text-red-400"
+                          : "bg-orange-500/15 border-orange-500/25 text-orange-400"
+                      }`}>
+                        {f.severity?.toUpperCase()}
+                      </span>
                     </div>
                   </div>
                 ))

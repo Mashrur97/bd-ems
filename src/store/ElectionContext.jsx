@@ -70,11 +70,16 @@ export function ElectionProvider({ children }) {
     }
   }, []);
 
-  const castVote = async (voterId, candidateId) => {
-    const { data } = await api.post("/api/voter/vote", { candidateId });
-    await fetchPublicResults();
-    return data;
-  };
+  // const castVote = async (voterId, candidateId) => {
+  //   const { data } = await api.post("/api/voter/vote", { candidateId });
+  //   await fetchPublicResults();
+  //   return data;
+  // };
+const castVote = async (voterId, candidateId) => {
+  const { data } = await api.post("/api/voter/vote", { candidateId });
+  await fetchPublicResults();
+  return data; 
+};
 
   const submitBooth = async (boothId, used, candidateVotes) => {
     const { data } = await api.post("/api/booth/submit", { boothId, used, candidateVotes });

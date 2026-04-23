@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useElection } from "../store/ElectionContext";
-import { CANDIDATES, CONSTITUENCIES } from "../data/mockData";
 import VoteBar from "../components/VoteBar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -12,25 +11,30 @@ import { Vote, TrendingUp, Building2, AlertTriangle } from "lucide-react";
 
 export default function Guest() {
   const navigate = useNavigate();
-  const { votes, totalVotes, turnout, fraudFlags } = useElection();
+  const { votes, candidates, totalVotes, turnout, fraudFlags, fetchPublicResults } = useElection();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    fetchPublicResults();
+    // poll every 10 seconds
+    const poll = setInterval(() => fetchPublicResults(), 10000);
+    const clock = setInterval(() => setTime(new Date()), 1000);
+    return () => { clearInterval(poll); clearInterval(clock); };
   }, []);
 
-  const lead = CANDIDATES.reduce((a, b) => (votes[a.id] > votes[b.id] ? a : b));
+  const lead = candidates.length > 0
+    ? candidates.reduce((a, b) => ((votes[a.candidateId] || 0) > (votes[b.candidateId] || 0) ? a : b))
+    : null;
 
-  // fixed random values so they dont change on every render
+  // fixed random values so they don't change on every render
   const constituencyStats = useMemo(
-    () =>
-      CONSTITUENCIES.map((c) => ({
-        ...c,
-        votes: Math.floor(800 + Math.random() * 200),
-        pct: Math.floor(60 + Math.random() * 30),
-      })),
+    () => [
+      { id: 1, name: "Dhaka-1 (Dohar-Nawabganj)", votes: 843, pct: 68 },
+      { id: 2, name: "Dhaka-2 (Motijheel)", votes: 921, pct: 74 },
+      { id: 3, name: "Dhaka-3 (Tejgaon)", votes: 778, pct: 63 },
+      { id: 4, name: "Dhaka-4 (Sutrapur)", votes: 1012, pct: 81 },
+    ],
     [],
   );
 
@@ -47,7 +51,7 @@ export default function Guest() {
           zIndex: 0,
           pointerEvents: "none",
           opacity: 0.6,
-          willChange: "transform" 
+          willChange: "transform",
         }}
       >
         <Hyperspeed />
@@ -70,9 +74,7 @@ export default function Guest() {
           rightContent={
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-xs text-red-400 tracking-widest font-bold hidden sm:block">
-                LIVE
-              </span>
+              <span className="text-xs text-red-400 tracking-widest font-bold hidden sm:block">LIVE</span>
             </div>
           }
         />
@@ -129,9 +131,7 @@ export default function Guest() {
                     key={c.id}
                     className="flex justify-between py-2.5 border-b border-white/5 text-sm last:border-0"
                   >
-                    <span className="text-white/50 text-xs md:text-sm">
-                      {c.name}
-                    </span>
+                    <span className="text-white/50 text-xs md:text-sm">{c.name}</span>
                     <span className="font-mono text-yellow-400 text-xs">
                       {c.votes.toLocaleString()}{" "}
                       <span className="text-white/30">{c.pct}%</span>
@@ -143,42 +143,36 @@ export default function Guest() {
 
             {/* side panel */}
             <div className="flex flex-col gap-4">
-              <div
-                className="bg-black/40 backdrop-blur rounded-2xl p-5 text-center border transition-all"
-                style={{
-                  borderColor: lead.color + "44",
-                  background: lead.color + "12",
-                }}
-              >
-                <div className="text-[10px] tracking-widest text-white/30 mb-2">
-                  CURRENTLY LEADING
-                </div>
-                <div className="text-4xl mb-2">{lead.symbol}</div>
-                <div className="text-base font-bold text-yellow-400">
-                  {lead.name}
-                </div>
-                <div className="text-xs text-white/30 mb-3">{lead.party}</div>
+              {lead ? (
                 <div
-                  className="font-mono text-3xl font-bold"
-                  style={{ color: lead.color }}
+                  className="bg-black/40 backdrop-blur rounded-2xl p-5 text-center border transition-all"
+                  style={{
+                    borderColor: lead.color + "44",
+                    background: lead.color + "12",
+                  }}
                 >
-                  <CountUp end={votes[lead.id]} />
+                  <div className="text-[10px] tracking-widest text-white/30 mb-2">CURRENTLY LEADING</div>
+                  <div className="text-4xl mb-2">{lead.symbol}</div>
+                  <div className="text-base font-bold text-yellow-400">{lead.name}</div>
+                  <div className="text-xs text-white/30 mb-3">{lead.party}</div>
+                  <div className="font-mono text-3xl font-bold" style={{ color: lead.color }}>
+                    <CountUp end={votes[lead.candidateId] || 0} />
+                  </div>
+                  <div className="text-[10px] text-white/30 mt-1">VOTES</div>
                 </div>
-                <div className="text-[10px] text-white/30 mt-1">VOTES</div>
-              </div>
+              ) : (
+                <div className="bg-black/40 backdrop-blur rounded-2xl p-5 text-center border border-white/10">
+                  <div className="text-white/30 text-sm">Loading results...</div>
+                </div>
+              )}
 
               <div className="bg-black/40 backdrop-blur border border-red-500/20 rounded-2xl p-4">
-                <div className="text-[10px] tracking-widest text-red-400 font-bold mb-3">
-                  ⚠ FRAUD FLAGS
-                </div>
+                <div className="text-[10px] tracking-widest text-red-400 font-bold mb-3">⚠ FRAUD FLAGS</div>
                 {fraudFlags.length === 0 ? (
                   <div className="text-xs text-white/30">No active flags</div>
                 ) : (
                   fraudFlags.map((f, i) => (
-                    <div
-                      key={i}
-                      className="py-2 border-b border-white/5 last:border-0"
-                    >
+                    <div key={f._id || i} className="py-2 border-b border-white/5 last:border-0">
                       <div
                         className={`text-xs font-bold mb-0.5 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}
                       >
@@ -191,9 +185,7 @@ export default function Guest() {
               </div>
 
               <div className="bg-black/40 backdrop-blur border border-white/10 rounded-2xl p-4">
-                <div className="text-[10px] tracking-widest text-white/30 mb-3">
-                  ELECTION TIMELINE
-                </div>
+                <div className="text-[10px] tracking-widest text-white/30 mb-3">ELECTION TIMELINE</div>
                 {[
                   { time: "07:00", label: "Polling Opened", done: true },
                   { time: "09:14", label: "First Results", done: true },
@@ -201,27 +193,14 @@ export default function Guest() {
                   { time: "17:00", label: "Polling Closes", done: false },
                   { time: "21:00", label: "Results Final", done: false },
                 ].map((e) => (
-                  <div
-                    key={e.time}
-                    className="flex items-center gap-2 py-1.5 text-xs"
-                  >
+                  <div key={e.time} className="flex items-center gap-2 py-1.5 text-xs">
                     <span
                       className={`text-[10px] ${e.active ? "text-yellow-400" : e.done ? "text-green-400" : "text-white/20"}`}
                     >
                       ●
                     </span>
-                    <span className="text-white/30 font-mono w-10">
-                      {e.time}
-                    </span>
-                    <span
-                      className={
-                        e.active
-                          ? "text-white"
-                          : e.done
-                            ? "text-white/50"
-                            : "text-white/20"
-                      }
-                    >
+                    <span className="text-white/30 font-mono w-10">{e.time}</span>
+                    <span className={e.active ? "text-white" : e.done ? "text-white/50" : "text-white/20"}>
                       {e.label}
                     </span>
                   </div>
