@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { VOTERS } from "../../data/mockData";
 import toast from "react-hot-toast";
 import LightRays from "../../reactbits/LightRays";
 import { UserCheck, ChevronDown } from "lucide-react";
+import api from "../../api";
 
 const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"));
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -54,6 +54,7 @@ export default function VoterLogin() {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const existingVoter = sessionStorage.getItem("currentVoter");
@@ -66,55 +67,44 @@ export default function VoterLogin() {
     }
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    if (!nid || !day || !month || !year) {
+      setError("Please fill in all fields.");
+      return;
+    }
     const dob = `${year}-${String(months.indexOf(month) + 1).padStart(2, "0")}-${day}`;
-    const voter = VOTERS.find((v) => v.nid === nid && v.dob === dob);
-    if (voter) {
-      sessionStorage.setItem("currentVoter", JSON.stringify(voter));
-      toast.success(`Welcome, ${voter.name}`);
+    setLoading(true);
+    setError("");
+    try {
+      const { data } = await api.post("/api/voter/login", { nid, dob });
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("currentVoter", JSON.stringify(data.voter));
+      toast.success(`Welcome, ${data.voter.name}`);
       navigate("/voter/dashboard");
-    } else {
-      setError("NID or Date of Birth is incorrect. Please try again.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#06090f] text-white flex items-center justify-center relative">
       <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
-        <LightRays
-          raysOrigin="top-center"
-          raysColor="#22c55e"
-          raysSpeed={1}
-          lightSpread={0.8}
-          rayLength={2}
-          followMouse={true}
-          mouseInfluence={0.1}
-          noiseAmount={0}
-          distortion={0}
-          pulsating={false}
-          fadeDistance={0.8}
-          saturation={1}
-        />
+        <LightRays raysOrigin="top-center" raysColor="#22c55e" raysSpeed={1} lightSpread={0.8} rayLength={2} followMouse={true} mouseInfluence={0.1} noiseAmount={0} distortion={0} pulsating={false} fadeDistance={0.8} saturation={1} />
       </div>
 
       <div style={{ position: "relative", zIndex: 1 }} className="w-96 p-10 bg-black/50 backdrop-blur border border-green-500/20 rounded-3xl">
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-white/70 text-xs mb-7 hover:text-white transition-all bg-white/10 border border-white/15 px-3 py-2 rounded-lg backdrop-blur"
-        >← Back</button>
+        <button onClick={() => navigate("/")} className="flex items-center gap-2 text-white/70 text-xs mb-7 hover:text-white transition-all bg-white/10 border border-white/15 px-3 py-2 rounded-lg backdrop-blur">← Back</button>
 
         <div className="text-center mb-8">
-          <div className="mb-3 flex justify-center">
-            <UserCheck size={52} className="text-green-400" />
-          </div>
+          <div className="mb-3 flex justify-center"><UserCheck size={52} className="text-green-400" /></div>
           <div className="text-2xl font-bold">Voter Login</div>
           <div className="text-xs text-white/30 mt-1">ভোটার যাচাইকরণ</div>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm mb-4">
-            {error}
-          </div>
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm mb-4">{error}</div>
         )}
 
         <div className="flex flex-col gap-4">
@@ -144,8 +134,9 @@ export default function VoterLogin() {
 
           <button
             onClick={handleLogin}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-sm hover:brightness-110 hover:-translate-y-0.5 transition-all mt-1"
-          >Verify & Enter →</button>
+            disabled={loading}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-sm hover:brightness-110 hover:-translate-y-0.5 transition-all mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >{loading ? "Verifying..." : "Verify & Enter →"}</button>
         </div>
       </div>
     </div>
