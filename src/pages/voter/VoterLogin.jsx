@@ -129,7 +129,7 @@ export default function VoterLogin() {
           </div>
 
           <div className="text-[10px] text-white/20 text-center py-1">
-            Demo: <b className="text-white/40">1234567890123</b> · <b className="text-white/40">12 / March / 1985</b>
+            Demo: <b className="text-white/40">1234567890123</b> · <b className="text-white/40">1 / January / 2006</b>
           </div>
 
           <button

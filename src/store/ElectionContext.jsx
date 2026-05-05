@@ -13,6 +13,8 @@ export function ElectionProvider({ children }) {
   const [auditLog, setAuditLog] = useState([]);
   const [constituencyCompiled, setConstituencyCompiled] = useState(false);
   const [resultsDeclaimed, setResultsDeclaimed] = useState(false);
+  const [declaredBy, setDeclaredBy] = useState(null);
+  const [declaredAt, setDeclaredAt] = useState(null);
   const [eligibleVoters, setEligibleVoters] = useState(8200);
 
   const fetchPublicResults = useCallback(async () => {
@@ -23,6 +25,8 @@ export function ElectionProvider({ children }) {
       setFraudFlags(data.fraudFlags);
       setConstituencyCompiled(data.constituencyCompiled);
       setResultsDeclaimed(data.resultsDeclared);
+      setDeclaredBy(data.declaredBy || null);
+      setDeclaredAt(data.declaredAt || null);
       setEligibleVoters(data.eligibleVoters);
       return data;
     } catch (err) {
@@ -111,6 +115,12 @@ const castVote = async (voterId, candidateId) => {
     return data;
   };
 
+  const resolveIncident = async (incidentId) => {
+    const { data } = await api.patch(`/api/incidents/${incidentId}`);
+    await fetchIncidents();
+    return data;
+  };
+
   const totalVotes = () => Object.values(votes).reduce((a, b) => a + b, 0);
   const turnout = () => ((totalVotes() / eligibleVoters) * 100).toFixed(1);
   const pct = (id) => totalVotes() > 0 ? ((votes[id] / totalVotes()) * 100).toFixed(1) : 0;
@@ -123,7 +133,7 @@ const castVote = async (voterId, candidateId) => {
       fetchPublicResults, fetchMyBooths, fetchMyStation,
       fetchIncidents, fetchAuditLog,
       castVote, submitBooth, verifyStation,
-      compileConstituency, declareResults, reportIncident,
+      compileConstituency, declareResults, reportIncident, resolveIncident,
       totalVotes, turnout, pct,
     }}>
       {children}

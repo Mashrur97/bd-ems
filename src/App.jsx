@@ -22,11 +22,11 @@ export default function App() {
       <Route path="/officer/po" element={<PO />} />
       <Route path="/officer/aro" element={<ARO />} />
       <Route path="/officer/ro" element={<RO />} />
-      <Route path="*" element={<Navigate to="/" />} />
       <Route path="/officer/apo/dashboard" element={<APODashboard />} />
       <Route path="/officer/po/dashboard" element={<PODashboard />} />
       <Route path="/officer/aro/dashboard" element={<ARODashboard />} />
       <Route path="/officer/ro/dashboard" element={<RODashboard />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

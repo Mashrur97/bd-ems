@@ -295,11 +295,12 @@ function HowItWorks() {
 // ─── LANDING ─────────────────────────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
-  const { totalVotes, turnout } = useElection();
+  const { totalVotes, turnout, fraudFlags, fetchPublicResults } = useElection();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
+    fetchPublicResults();
     return () => clearInterval(t);
   }, []);
 
@@ -433,12 +434,8 @@ export default function Landing() {
               <b className="text-green-400">{turnout()}%</b> turnout
             </span>
             <span className="flex items-center gap-1.5">
-              <Building2 size={14} className="text-blue-400" />
-              <b className="text-blue-400">847/1,200</b> stations
-            </span>
-            <span className="flex items-center gap-1.5">
               <AlertTriangle size={14} className="text-orange-400" />
-              <b className="text-orange-400">2</b> flags
+              <b className="text-orange-400">{fraudFlags.length}</b> flags
             </span>
           </div>
         </div>

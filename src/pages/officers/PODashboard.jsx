@@ -20,6 +20,7 @@ export default function PODashboard() {
     incidents,
     verifyStation,
     reportIncident,
+    resolveIncident,
     fetchMyStation,
     fetchIncidents,
     fetchPublicResults,
@@ -235,6 +236,11 @@ export default function PODashboard() {
 
               {!station?.verified ? (
                 <div>
+                  {stationBooths.length === 0 && (
+                    <div className="bg-red-500/10 border border-red-500/25 rounded-xl px-4 py-3 text-red-400 text-xs mb-4">
+                      ✗ No booths assigned to this station. Cannot verify.
+                    </div>
+                  )}
                   {submittedBooths.length < stationBooths.length && stationBooths.length > 0 && (
                     <div className="bg-orange-500/10 border border-orange-500/25 rounded-xl px-4 py-3 text-orange-400 text-xs mb-4">
                       ⚠ {stationBooths.length - submittedBooths.length} booth(s) not yet submitted. Verifying with partial data.
@@ -242,8 +248,8 @@ export default function PODashboard() {
                   )}
                   <button
                     onClick={handleVerify}
-                    disabled={verifying}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-orange-600 to-orange-700 text-white font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50"
+                    disabled={verifying || stationBooths.length === 0}
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-orange-600 to-orange-700 text-white font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {verifying ? "Verifying..." : "✓ Verify & Submit Station Result →"}
                   </button>
@@ -321,15 +327,31 @@ export default function PODashboard() {
                       <div className="text-xs text-white/30 mt-0.5">{inc.center}</div>
                       <div className="text-xs text-white/50 mt-1">{inc.desc}</div>
                     </div>
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold border flex-shrink-0 ${
-                        inc.status === "active"
-                          ? "bg-red-500/15 border-red-500/25 text-red-400"
-                          : "bg-green-500/15 border-green-500/25 text-green-400"
-                      }`}
-                    >
-                      {inc.status?.toUpperCase()}
-                    </span>
+                    {inc.status === "active" ? (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await resolveIncident(inc._id);
+                            toast.success("Incident resolved");
+                          } catch (err) {
+                            toast.error(err.response?.data?.message || "Failed to resolve");
+                          }
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30"
+                      >
+                        Resolve
+                      </button>
+                    ) : (
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold border flex-shrink-0 ${
+                          inc.status === "active"
+                            ? "bg-red-500/15 border-red-500/25 text-red-400"
+                            : "bg-green-500/15 border-green-500/25 text-green-400"
+                        }`}
+                      >
+                        {inc.status?.toUpperCase()}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

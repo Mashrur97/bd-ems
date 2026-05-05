@@ -15,6 +15,7 @@ import {
   CheckCircle,
   AlertCircle,
   Inbox,
+  Download,
 } from "lucide-react";
 
 export default function VoterDashboard() {
@@ -307,7 +308,7 @@ export default function VoterDashboard() {
                 <div className="text-sm text-white/20 mt-2">Cast your vote first.</div>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-yellow-500/25 rounded-2xl p-6 md:p-10 text-center">
+              <div className="border-2 border-dashed border-yellow-500/25 rounded-2xl p-6 md:p-10 text-center no-print">
                 <div className="text-[10px] tracking-widest text-yellow-400 mb-1">
                   OFFICIAL VOTING RECEIPT
                 </div>
@@ -327,7 +328,7 @@ export default function VoterDashboard() {
                     ["Constituency ID", voter.constituencyId],
                     //["Timestamp", new Date().toLocaleString("en-BD")],
                     ["Timestamp", voter.votedAt ? new Date(voter.votedAt).toLocaleString("en-BD") : "—"],
-                    ["Reference", "BD-2024-" + voter.nid.slice(-6)],
+                    ["Reference", "BD-2026-" + voter.nid.slice(-6)],
                   ].map(([k, v]) => (
                     <div
                       key={k}
@@ -341,6 +342,12 @@ export default function VoterDashboard() {
                 <div className="text-[10px] text-white/20 mt-5 italic">
                   Your individual choice remains secret. This slip confirms participation only.
                 </div>
+                <button
+                  onClick={() => window.print()}
+                  className="mt-6 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-sm font-medium hover:bg-yellow-500/30 transition-all"
+                >
+                  <Download size={18} /> Print Receipt
+                </button>
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useElection } from "../store/ElectionContext";
 import VoteBar from "../components/VoteBar";
@@ -7,12 +7,14 @@ import Footer from "../components/Footer";
 import StatCard from "../components/StatCard";
 import CountUp from "../components/CountUp";
 import Hyperspeed from "../reactbits/Hyperspeed";
+import toast from "react-hot-toast";
 import { Vote, TrendingUp, Building2, AlertTriangle } from "lucide-react";
 
 export default function Guest() {
   const navigate = useNavigate();
-  const { votes, candidates, totalVotes, turnout, fraudFlags, fetchPublicResults } = useElection();
+  const { votes, candidates, totalVotes, turnout, fraudFlags, fetchPublicResults, resultsDeclaimed, declaredBy, declaredAt } = useElection();
   const [time, setTime] = useState(new Date());
+  const declaredToastShown = useRef(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -22,6 +24,18 @@ export default function Guest() {
     const clock = setInterval(() => setTime(new Date()), 1000);
     return () => { clearInterval(poll); clearInterval(clock); };
   }, []);
+
+  useEffect(() => {
+    if (resultsDeclaimed && !declaredToastShown.current) {
+      const timeLabel = declaredAt ? new Date(declaredAt).toLocaleTimeString("en-BD", { hour: "2-digit", minute: "2-digit" }) : null;
+      const nameLabel = declaredBy ? `${declaredBy}` : "RO";
+      const message = timeLabel
+        ? `${nameLabel} declared the result at ${timeLabel}`
+        : `${nameLabel} has declared the result`;
+      toast.success(message, { duration: 10000 });
+      declaredToastShown.current = true;
+    }
+  }, [resultsDeclaimed, declaredBy, declaredAt]);
 
   const lead = candidates.length > 0
     ? candidates.reduce((a, b) => ((votes[a.candidateId] || 0) > (votes[b.candidateId] || 0) ? a : b))
