@@ -1,3 +1,5 @@
+[//]: # (updated: may 2026)
+
 # 🇧🇩 Bangladesh Election Management System
 
 > Digital Election Management System for the Bangladesh Election Commission  
@@ -109,33 +111,68 @@ A full-stack election management prototype simulating the digitization of Bangla
 ---
 
 ## 📁 Project Structure
-src/
-├── store/
-│   └── ElectionContext.jsx       # Global state & actions
-├── components/
-│   ├── Navbar.jsx
-│   ├── Footer.jsx                # Includes dev reset (click "Digital Bangladesh Vision 2077" x5)
-│   ├── Sidebar.jsx
-│   ├── VoteBar.jsx
-│   └── OfficerLogin.jsx
-├── reactbits/
-│   ├── Particles.jsx
-│   ├── LightRays.jsx
-│   ├── Galaxy.jsx
-│   ├── BlurText.jsx
-│   └── DecryptedText.jsx
-└── pages/
-├── Landing.jsx
-├── Guest.jsx
-├── ReportFeed.jsx            # Public citizen incident feed
-├── voter/
-│   ├── VoterLogin.jsx        # Booth finder + optional login
-│   └── VoterDashboard.jsx
-└── officers/
-├── APODashboard.jsx
-├── PODashboard.jsx
-├── ARODashboard.jsx
-└── RODashboard.jsx
+
+```
+bd-ems/
+├── back/
+│   ├── models/
+│   │   ├── Voter.js
+│   │   ├── Booth.js
+│   │   ├── Station.js
+│   │   ├── Constituency.js
+│   │   ├── Candidate.js
+│   │   ├── ElectionState.js
+│   │   ├── FraudFlag.js
+│   │   ├── AuditLog.js
+│   │   ├── Incident.js
+│   │   └── Report.js
+│   ├── routes/
+│   │   ├── voter.js
+│   │   ├── officer.js
+│   │   ├── booth.js
+│   │   ├── station.js
+│   │   ├── constituency.js
+│   │   ├── results.js
+│   │   ├── audit.js
+│   │   ├── incidents.js
+│   │   ├── report.js
+│   │   └── dev.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── scripts/
+│   │   └── seed.js
+│   └── server.js
+└── front/
+    ├── src/
+    │   ├── store/
+    │   │   └── ElectionContext.jsx
+    │   ├── components/
+    │   │   ├── Navbar.jsx
+    │   │   ├── Footer.jsx
+    │   │   ├── Sidebar.jsx
+    │   │   ├── VoteBar.jsx
+    │   │   └── OfficerLogin.jsx
+    │   ├── reactbits/
+    │   │   ├── Particles.jsx
+    │   │   ├── LightRays.jsx
+    │   │   ├── Galaxy.jsx
+    │   │   ├── BlurText.jsx
+    │   │   └── DecryptedText.jsx
+    │   └── pages/
+    │       ├── Landing.jsx
+    │       ├── Guest.jsx
+    │       ├── ReportFeed.jsx
+    │       ├── voter/
+    │       │   ├── VoterLogin.jsx
+    │       │   └── VoterDashboard.jsx
+    │       └── officers/
+    │           ├── APODashboard.jsx
+    │           ├── PODashboard.jsx
+    │           ├── ARODashboard.jsx
+    │           └── RODashboard.jsx
+    └── public/
+        └── favicon.svg
+```
 
 ---
 
@@ -164,19 +201,22 @@ Backend: [http://localhost:5000](http://localhost:5000)
 ---
 
 ## 🔄 Election Workflow
+
+```
 Voter looks up polling station by NID (public, no login)
-↓
+        ↓
 Voter attends assigned assisted voting center
-↓
+        ↓
 APO enters booth vote counts → validates ballots
-↓
+        ↓
 PO verifies station results (blocked until all booths submitted)
-↓
+        ↓
 ARO compiles constituency results → forwards to RO
-↓
+        ↓
 RO reviews & officially declares results
-↓
+        ↓
 Results published to public live feed
+```
 
 ---
 
