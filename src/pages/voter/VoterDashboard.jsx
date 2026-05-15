@@ -16,16 +16,23 @@ import {
   AlertCircle,
   Inbox,
   Download,
+  Flag,
+  Camera,
 } from "lucide-react";
+import api from "../../api";
 
 export default function VoterDashboard() {
   const navigate = useNavigate();
-  const { candidates, votes, castVote, fetchPublicResults, totalVotes, turnout } = useElection();
+  const { candidates, castVote, fetchPublicResults, totalVotes, turnout } = useElection();
   const [voter, setVoter] = useState(null);
   const [tab, setTab] = useState("home");
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [reportDesc, setReportDesc] = useState("");
+  const [reportLocation, setReportLocation] = useState("");
+  const [reportPhoto, setReportPhoto] = useState(null);
+  const [submittingReport, setSubmittingReport] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("currentVoter");
@@ -39,8 +46,6 @@ export default function VoterDashboard() {
   const handleCastVote = async () => {
     setVoting(true);
     try {
-      //await castVote(voter.nid, selected);
-      //const updated = { ...voter, voted: true };
       const data = await castVote(voter.nid, selected);
       const updated = { ...voter, voted: true, votedAt: data.votedAt };
       sessionStorage.setItem("currentVoter", JSON.stringify(updated));
@@ -57,7 +62,39 @@ export default function VoterDashboard() {
     }
   };
 
-  const tabs = ["home", "vote", "results", "slip"];
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setReportPhoto(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!reportDesc.trim() || !reportLocation.trim()) {
+      toast.error("Description and location are required");
+      return;
+    }
+    setSubmittingReport(true);
+    try {
+      const token = sessionStorage.getItem("token");
+      await api.post(
+        "/api/reports",
+        { description: reportDesc.trim(), location: reportLocation.trim(), photo: reportPhoto },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Report submitted!");
+      setReportDesc("");
+      setReportLocation("");
+      setReportPhoto(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit report");
+    } finally {
+      setSubmittingReport(false);
+    }
+  };
+
+  const tabs = ["home", "vote", "results", "report", "slip"];
 
   return (
     <div className="min-h-screen bg-[#06090f] text-white flex flex-col">
@@ -109,6 +146,8 @@ export default function VoterDashboard() {
                 <Vote size={18} />
               ) : t === "results" ? (
                 <BarChart2 size={18} />
+              ) : t === "report" ? (
+                <Flag size={18} />
               ) : (
                 <FileText size={18} />
               )}
@@ -133,6 +172,7 @@ export default function VoterDashboard() {
                   </div>
                   <div className="text-xs text-white/40 mt-1">NID: {voter.nid}</div>
                   <div className="text-xs text-white/40">District: {voter.district}</div>
+                  <div className="text-xs text-white/40">Polling Station: {voter.stationName}</div>
                   <div className="text-xs text-white/30 truncate">
                     Constituency ID: {voter.constituencyId}
                   </div>
@@ -176,9 +216,17 @@ export default function VoterDashboard() {
                   disabled: !voter.voted,
                 },
                 {
+                  icon: <Flag size={28} className="text-red-400" />,
+                  title: "Report Incident",
+                  desc: "Report center misconduct",
+                  tab: "report",
+                  color: "red",
+                  disabled: false,
+                },
+                {
                   icon: <MapPin size={28} className="text-purple-400" />,
                   title: "My Booth",
-                  desc: `Booth ID: ${voter.boothId}`,
+                  desc: `${voter.stationName} · Booth ${voter.boothId}`,
                   tab: null,
                   color: "purple",
                   disabled: false,
@@ -298,6 +346,70 @@ export default function VoterDashboard() {
           </div>
         )}
 
+        {/* REPORT TAB */}
+        {tab === "report" && (
+          <div>
+            <div className="flex items-center gap-2 text-xl md:text-2xl font-bold mb-1">
+              <Flag size={24} className="text-red-400" /> Report an Incident
+            </div>
+            <div className="text-xs text-white/30 mb-6">
+              Witnessed coercion or misconduct at an assisted voting center? Report it here.
+            </div>
+
+            <div className="bg-white/[0.03] border border-red-500/20 rounded-2xl p-5 flex flex-col gap-4">
+              <div>
+                <label className="text-[10px] tracking-widest text-white/30 mb-2 block">LOCATION</label>
+                <input
+                  type="text"
+                  value={reportLocation}
+                  onChange={e => setReportLocation(e.target.value)}
+                  placeholder="e.g. Motijheel Govt. School, Room 3"
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-white text-sm outline-none focus:border-red-500/40 transition-all placeholder:text-white/20"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-widest text-white/30 mb-2 block">DESCRIPTION</label>
+                <textarea
+                  value={reportDesc}
+                  onChange={e => setReportDesc(e.target.value)}
+                  placeholder="Describe what you witnessed..."
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-white text-sm outline-none focus:border-red-500/40 transition-all placeholder:text-white/20 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] tracking-widest text-white/30 mb-2 block">PHOTO (OPTIONAL)</label>
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 cursor-pointer hover:border-white/20 transition-all">
+                  <Camera size={16} className="text-white/40" />
+                  <span className="text-sm text-white/40">
+                    {reportPhoto ? "Photo attached ✓" : "Attach a photo"}
+                  </span>
+                  <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                </label>
+                {reportPhoto && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-white/10">
+                    <img src={reportPhoto} alt="Preview" className="w-full max-h-48 object-cover" />
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmitReport}
+                disabled={submittingReport || !reportDesc.trim() || !reportLocation.trim()}
+                className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
+                  !submittingReport && reportDesc.trim() && reportLocation.trim()
+                    ? "bg-gradient-to-r from-red-600 to-red-700 text-white hover:brightness-110"
+                    : "bg-white/5 text-white/20 cursor-not-allowed"
+                }`}
+              >
+                {submittingReport ? "Submitting..." : "Submit Report →"}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* SLIP TAB */}
         {tab === "slip" && (
           <div>
@@ -324,9 +436,9 @@ export default function VoterDashboard() {
                     ["Voter Name", voter.name],
                     ["NID", voter.nid],
                     ["District", voter.district],
+                    ["Polling Station", voter.stationName],
                     ["Booth ID", voter.boothId],
                     ["Constituency ID", voter.constituencyId],
-                    //["Timestamp", new Date().toLocaleString("en-BD")],
                     ["Timestamp", voter.votedAt ? new Date(voter.votedAt).toLocaleString("en-BD") : "—"],
                     ["Reference", "BD-2026-" + voter.nid.slice(-6)],
                   ].map(([k, v]) => (

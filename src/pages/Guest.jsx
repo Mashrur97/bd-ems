@@ -181,16 +181,16 @@ export default function Guest() {
               )}
 
               <div className="bg-black/40 backdrop-blur border border-red-500/20 rounded-2xl p-4">
-                <div className="text-[10px] tracking-widest text-red-400 font-bold mb-3">⚠ FRAUD FLAGS</div>
+                <div className="text-[10px] tracking-widest text-red-400 font-bold mb-3 flex items-center gap-1.5"><AlertTriangle size={14} /> FRAUD FLAGS</div>
                 {fraudFlags.length === 0 ? (
                   <div className="text-xs text-white/30">No active flags</div>
                 ) : (
                   fraudFlags.map((f, i) => (
                     <div key={f._id || i} className="py-2 border-b border-white/5 last:border-0">
                       <div
-                        className={`text-xs font-bold mb-0.5 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}
+                        className={`text-xs font-bold mb-0.5 flex items-center gap-1.5 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}
                       >
-                        ⚠ {f.booth}
+                        <AlertTriangle size={14} /> {f.booth}
                       </div>
                       <div className="text-[11px] text-white/40">{f.issue}</div>
                     </div>

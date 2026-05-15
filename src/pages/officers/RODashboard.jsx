@@ -17,6 +17,8 @@ import {
   TrendingUp,
   Building2,
   AlertTriangle,
+  Sparkles,
+  Scale,
 } from "lucide-react";
 
 export default function RODashboard() {
@@ -151,11 +153,11 @@ export default function RODashboard() {
                     disabled={declaring}
                     className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50"
                   >
-                    {declaring ? "Declaring..." : "⚖️ Declare Official Results →"}
+                    {declaring ? "Declaring..." : <><Scale size={16} className="inline mr-1" /> Declare Official Results →</>}
                   </button>
                 ) : (
-                  <div className="bg-green-500/10 border border-green-500/25 rounded-xl px-4 py-3 text-green-400 text-sm">
-                    🎉 Results officially declared and published to public feed.
+                  <div className="bg-green-500/10 border border-green-500/25 rounded-xl px-4 py-3 text-green-400 text-sm flex items-center gap-2">
+                    <Sparkles size={16} /> Results officially declared and published to public feed.
                   </div>
                 )}
               </div>

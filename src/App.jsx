@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Guest from "./pages/Guest";
+import ReportFeed from "./pages/ReportFeed";
 import VoterLogin from "./pages/voter/VoterLogin";
 import VoterDashboard from "./pages/voter/VoterDashboard";
 import APO from "./pages/officers/APO";
@@ -16,6 +17,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/guest" element={<Guest />} />
+      <Route path="/reports" element={<ReportFeed />} />
       <Route path="/voter/login" element={<VoterLogin />} />
       <Route path="/voter/dashboard" element={<VoterDashboard />} />
       <Route path="/officer/apo" element={<APO />} />

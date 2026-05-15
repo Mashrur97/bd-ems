@@ -17,6 +17,7 @@ import {
   BarChart2,
   Building2,
   AlertTriangle,
+  Flag,
 } from "lucide-react";
 
 // ─── HOW IT WORKS ────────────────────────────────────────────────────────────
@@ -479,6 +480,21 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* field reports banner */}
+          <div
+            onClick={() => navigate("/reports")}
+            className="mt-4 cursor-pointer rounded-2xl border border-cyan-500/15 bg-white/[0.02] hover:bg-cyan-500/[0.06] hover:border-cyan-500/30 transition-all duration-300 px-6 py-4 flex items-center gap-4"
+          >
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+              <Flag size={18} className="text-cyan-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-cyan-400">Field Reports — Citizen Incident Feed</div>
+              <div className="text-xs text-white/30 mt-0.5">Community-verified reports from assisted voting centers · নাগরিক প্রতিবেদন</div>
+            </div>
+            <div className="text-xs text-cyan-400/60 flex-shrink-0">View feed →</div>
           </div>
         </div>
 

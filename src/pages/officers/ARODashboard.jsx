@@ -224,8 +224,8 @@ export default function ARODashboard() {
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className={`font-bold text-sm mb-1 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}>
-                          ⚠ {f.booth} — {f.station}
+                        <div className={`font-bold text-sm mb-1 flex items-center gap-2 ${f.severity === "high" ? "text-red-400" : "text-orange-400"}`}>
+                          <AlertTriangle size={16} /> {f.booth} — {f.station}
                         </div>
                         <div className="text-xs text-white/40">{f.issue}</div>
                         {f.createdAt && (

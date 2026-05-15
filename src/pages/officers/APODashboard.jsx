@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 import toast from "react-hot-toast";
-import { PenSquare, Building2, CheckCircle } from "lucide-react";
+import { PenSquare, Building2, CheckCircle, Check, X, AlertCircle } from "lucide-react";
 import api from "../../api";
 
 export default function APODashboard() {
@@ -165,7 +165,7 @@ export default function APODashboard() {
                             : "border-white/10 text-white/50 hover:border-white/30 hover:text-white"
                       }`}
                     >
-                      {b.submitted ? "✓ " : ""}
+                      {b.submitted ? <Check size={16} className="inline mr-1" /> : ""}
                       {b.name}
                     </button>
                   ))}
@@ -239,19 +239,18 @@ export default function APODashboard() {
                     ))}
                   </div>
 
-                  {errors.length > 0 && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 mb-4">
                       {errors.map((e, i) => (
-                        <div key={i} className="text-red-400 text-xs">
-                          ✗ {e}
+                        <div key={i} className="text-red-400 text-xs flex items-center gap-2">
+                          <X size={14} /> {e}
                         </div>
                       ))}
                     </div>
-                  )}
 
                   {fraudWarn && (
-                    <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl px-4 py-3 mb-4 text-orange-400 text-xs">
-                      ⚠ Anomaly detected: turnout deviation exceeds 20% from
+                    <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl px-4 py-3 mb-4 text-orange-400 text-xs flex items-center gap-2">
+                      <AlertCircle size={14} />
+                      Anomaly detected: turnout deviation exceeds 20% from
                       station average. Please double-check.
                     </div>
                   )}
@@ -259,8 +258,8 @@ export default function APODashboard() {
                   {errors.length === 0 &&
                     used &&
                     Object.values(candVotes).some((v) => v) && (
-                      <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 mb-4 text-green-400 text-xs">
-                        ✓ All validations passed
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 mb-4 text-green-400 text-xs flex items-center gap-2">
+                        <Check size={14} /> All validations passed
                       </div>
                     )}
 
@@ -357,7 +356,9 @@ export default function APODashboard() {
                     key={b.boothId}
                     className="bg-white/[0.03] border border-green-500/20 rounded-2xl p-5 mb-4"
                   >
-                    <div className="font-bold text-base mb-4">✅ {b.name}</div>
+                    <div className="font-bold text-base mb-4 flex items-center gap-2">
+                      <Check size={20} className="text-green-400" /> {b.name}
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
                       {candidates.map((c) => {
                         // candidateVotes from backend is a Map, might come as object

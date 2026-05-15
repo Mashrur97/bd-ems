@@ -1,6 +1,30 @@
 import { Github, Globe, Shield, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import api from "../api";
 
 export default function Footer() {
+  const [clicks, setClicks] = useState(0);
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSecretClick = async () => {
+    const next = clicks + 1;
+    setClicks(next);
+    if (next === 5) {
+      setClicks(0);
+      setSeeding(true);
+      try {
+        await api.post("/api/dev/seed");
+        toast.success("Database reset! Reloading...");
+        setTimeout(() => window.location.reload(), 1500);
+      } catch {
+        toast.error("Seed failed");
+      } finally {
+        setSeeding(false);
+      }
+    }
+  };
+
   return (
     <div className="border-t border-white/10 bg-black/40 backdrop-blur mt-10">
       <div className="max-w-5xl mx-auto px-6 py-10">
@@ -48,7 +72,15 @@ export default function Footer() {
             © 2026 Bangladesh Election Commission · EMS
           </div>
           <div className="flex items-center gap-2 text-xs text-white/20">
-            <Shield size={11} /> Digital Bangladesh Vision 2077
+            <Shield size={11} />
+            {/* secret reset — click 5 times */}
+            <span
+              onClick={handleSecretClick}
+              className="cursor-default select-none"
+              title=""
+            >
+              {seeding ? "Resetting..." : "Digital Bangladesh Vision 2077"}
+            </span>
           </div>
         </div>
       </div>
